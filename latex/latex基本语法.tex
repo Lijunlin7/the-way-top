@@ -4,6 +4,7 @@
 \usepackage{tabularx}
 \usepackage{ctex}
 \usepackage{natbib}
+\usepackage{hyperref}
 \setcitestyle{numbers,square}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,6 +186,7 @@
     \begin{enumerate}[(a)]% 次级序号
         \item 加减%+,-,\pm,\mp,\dotplus
         \item 其他%\times, \div, \divideontimes, /, \backslash
+        \item 文本读书符号 22\textdegree
     \end{enumerate}
 
     \item  标准函数
@@ -217,6 +219,19 @@
 	\end{tabular}
 \caption{\fontsize{10pt}{15pt}\selectfont 表}
 \end{table}
+%经典三线表
+\begin{table}[H]
+	\caption{\textbf{Example 1}}%标题
+	\centering%把表居中
+	\begin{tabular}{cccc}%四个c代表该表一共四列，内容全部居中
+	\toprule%第一道横线
+	Item 1&Item 2&Item 3&Item 4 \\
+	\midrule%第二道横线 
+	Data1&Data2&Data3&Data4 \\
+	Data5&Data6&Data7&Data8 \\
+	\bottomrule%第三道横线
+	\end{tabular}
+\end{table}
 
 \newpage
 \section{参考文献}
@@ -227,5 +242,18 @@
     
    
 \end{thebibliography}
+\section{超链接}
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=cyan,
+pdftitle={Example Title},
+pdfpagemode=FullScreen,
+}
+这是一个链接到 \href{https://www.example.com}{Example 网站} 的示例。
 
+这是一个链接到 \href{mailto:example@example.com}{电子邮件} 的示例。
+
+这是一个链接到本地文件 \href{run:./file.txt}{file.txt} 的示例。
 \end{document}% 结束文档编辑，后面写啥都编译不出来

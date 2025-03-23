@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ctex}
+\usepackage{gensymb}
+
+\title{非齐次方程练习}
+\author{李俊霖}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\section{问题提出}
+已知一颗炮弹做斜上抛运动，初速度大小为200m/s，击中水平距离360m、垂直距离160m的目标，问当忽略空气阻力时，炮弹发射角多大？
+请给出这道高中物理题的答案，并画出炮弹飞行的轨迹。
+\\ \indent 要求: 提交一份word或pdf文档，需包含模型假设、模型建立、模型求解（需包含发射角的大小和炮弹飞行轨迹图）和附录这几部分。附录中要放上你用来求解模型的代码。  
+\section{模型假设}
+1. 忽略空气阻力：炮弹在飞行过程中只受重力作用
+\\ \indent 2. 重力加速度恒定:重力加速度 g=9.81m/s
+\\ \indent 3. 初始速度已知：炮弹的初速度大小为 v0=200m/s
+\\ \indent 4. 目标位置已知：炮弹需要击中水平距离 x=360m,垂直距离 y=160m的目标。
+\section{模型建立}
+炮弹的运动可以分解为水平方向和垂直方向的运动：
+\\ \indent 水平方向：初速度分量：
+\begin{eqnarray}
+    V_{0x}=v_0*\cos(a)
+\end{eqnarray}
+运动方程：
+\begin{eqnarray}
+    x=V_{0x}*t
+\end{eqnarray}
+\\ \indent 垂直方向：
+初速度分量：
+\begin{eqnarray}
+    V_{0y}=v_0*\sin(a)
+\end{eqnarray}
+运动方程：
+\begin{eqnarray}
+    y=V_{0y}*t-0.5*g*t^2
+\end{eqnarray}
+\\ \indent 其中,a为发射角,t 为飞行时间
+
+\section{模型求解}
+
+\subsection{求解流程}
+我们需要求解发射角θ 和飞行时间 t
+\\ \indent 水平方向方程：
+\begin{eqnarray}
+    x=v_0*\cos(a)*t
+\end{eqnarray}
+解得：
+\begin{eqnarray}
+   t=\frac{x}{v_0*\cos(a)}
+\end{eqnarray}
+\\ \indent 垂直方向方程:
+\begin{eqnarray}
+    y=v_0*\sin(a)*t-0.5*g*t^2
+\end{eqnarray}
+将 t 代入：
+\begin{eqnarray}
+    y=v_0*\sin(a)*\frac{x}{v_0*\cos(a)}-0.5*g*(\frac{x}{v_0*\cos(a)})^2
+\end{eqnarray}
+化简得：
+\begin{eqnarray}
+    y=x*\tan(a)-\frac{gx^2}{2v_0^2*(cos(a))^2}
+\end{eqnarray}
+利用三角恒等式 
+\begin{eqnarray}
+    \frac{1}{cos(a)^2}=1+\tan(a)^2
+\end{eqnarray}
+代入得：
+\begin{eqnarray}
+    y=x*\tan(a)-\frac{gx^2}{2*v_0^2}*(1+\tan(a)^2)
+\end{eqnarray}
+这是一个关于 tanθ 的二次方程：
+代入已知数值：x=360,y=160
+计算得：
+\begin{eqnarray}
+    31.86*\tan(a)^2-360*\tan(a)+191.86=0
+\end{eqnarray}
+观察得f(0)>0且f(1)<0,f(10)<0且f(11)>0
+运用二分法逼近得到在(0,1),(10,12)这两个区间中分别有一根
+
+\subsection{MATLAB代码如图}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-08 181209.jpg}
+\end{figure}
+\subsection {结果如图}
+\begin{figure}[h]% 插入两张图片并且并排
+	\centering
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.83\textwidth]{fi/屏幕截图 2025-03-08 180728.jpg}
+	\end{minipage}
+	\hspace{0cm}% 图片间距
+	\hfill% 撑满整行
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.83\textwidth]{fi/屏幕截图 2025-03-08 180745.jpg}
+	\end{minipage}
+\end{figure}
+\subsection{结果验证} 
+
+\begin{figure}[h]% 插入两张图片并且并排
+	\centering
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.83\textwidth]{fi/屏幕截图 2025-03-08 180942.jpg}
+		\caption{\fontsize{10pt}{15pt}\selectfont 图一 X1}
+	\end{minipage}
+	\hspace{0cm}% 图片间距
+	\hfill% 撑满整行
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.83\textwidth]{fi/屏幕截图 2025-03-08 181132.jpg}
+		\caption{\fontsize{10pt}{15pt}\selectfont 图二 X2}
+	\end{minipage}
+\end{figure}
+ 可知：tan(a)=11.055或tan(a)=0.55则发射角为 a=84.8\textdegree 或a=28.8\textdegree
+\\
+\subsection{将结果可视化}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-08 180433.jpg}
+\end{figure}
+
+
+\section{f附录}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-08 181209.jpg}
+\end{figure}
+
+
+\end{document}  
+

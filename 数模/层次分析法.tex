@@ -1,0 +1,289 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ctex}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage{booktabs} 
+\usepackage{enumerate}
+\usepackage{hyperref}
+\title{层次分析法}
+\author{李俊霖}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\section{问题提出}
+周末干什么已经和中午吃什么一样，成为困扰大学生的重大疑难问题之一，因此，大学生李华最近密集的安排将他搞的晕头转向，
+他想求助你帮他根据给出的条件为他安排最优的周末安排，请你根据此进行数学建模。
+\\ \indent 题目信息: 目标 周末安排；准则 紧急程度，心理接受度，精力占用度；方案 写数模作业，出去玩，在宿舍睡觉
+\\ \indent 判断矩阵
+\[
+W_{CB_1} = \begin{pmatrix}
+1 & 4 & 4 \\
+0.25 & 1  & 1 \\
+0.25 & 1  & 1
+\end{pmatrix}
+\]
+\[
+W_{CB_2} = \begin{pmatrix}
+1 & 0.2 & 0.5 \\
+5& 1  & 2.5 \\
+2 & 0.4  & 1
+\end{pmatrix}
+\]
+\[
+W_{CB_3} = \begin{pmatrix}
+1 & 2 & 10 \\
+0.5& 1  & 5 \\
+0.1 & 0.3  & 1
+\end{pmatrix}
+\]
+\[
+W_{BA} = \begin{pmatrix}
+1 & 2 & 4 \\
+0.5& 1  & 2 \\
+0.25 & 0.5  & 1
+\end{pmatrix}
+\]
+\section{模型假设}
+1. 除题目外其他信息对于模型没有其他影响
+\\ \indent 2. 方案层与准则层的重要程度取决于判断矩阵
+\\ \indent 3. 模型应用层次分析法建立
+\section{模型建立}
+为得到方案层中$C_1$，$C_2$，$C_3$对应的权重$W_{C_1A}$，$W_{C_2A}$，$W_{C_3A}$我们可以逐层地确定相邻层间的相对
+权重矩阵，并通过多个权重矩阵的相乘，确定最终的权重。
+\\ \indent 对于题目信息建立层次模型，如下图
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 110807.jpg}
+\end{figure}
+建立矩阵乘法公式
+\begin{equation}
+    \left[
+    \begin{array}{c}
+    W_{C_1A} \\
+    W_{C_2A} \\
+    W_{C_3A}
+    \end{array}
+    \right]
+    =
+    \left[
+    \begin{array}{ccc}
+    W_{C_1B_1} & W_{C_1B_2} & W_{C_1B_3} \\
+    W_{C_2B_1} & W_{C_2B_2} & W_{C_2B_3} \\
+    W_{C_3B_1} & W_{C_3B_2} & W_{C_3B_3}
+    \end{array}
+    \right]
+    \left[
+    \begin{array}{c}
+    W_{B_1A} \\ 
+    W_{B_2A} \\
+    W_{B_3A}
+    \end{array}
+    \right]
+    \end{equation}
+即
+\begin{equation}
+  W_{CA}=W_{CB}*W_{BA}
+\end{equation}
+由 $W_{CA}=W_{CB}*W_{BA}$ 可见所要求的C对A的权重矩阵为C对
+B的权重矩阵与B对A的权重矩阵的乘积。
+\\ \indent 对判断矩阵W进行特征值分解权重向量($W_{C_1B}$，$W_{C_2B}$，$W_{C_3B}$)取为
+矩阵模最大特征值对应的特征向量，这样的特征向量被
+称为主特征向量。由于权重向量各分量之和应该为1，
+故我们将各分量分别除以各分量之和，即进行归一化。
+\\ \indent 最终，我们计算得到三种候选项的权重向量
+\\ \indent 最终到得到了C和A层间的权重矩阵，并进行选择
+\section{模型求解}
+
+\subsection{求解$W_{CB}$}
+\begin{enumerate}[(1)]
+\item 求解$W_{CB_1}$，
+    原矩阵
+ \[
+ W_{CB_1} = \begin{pmatrix}
+ 1 & 4 & 4 \\
+ 0.25 & 1  & 1 \\
+ 0.25 & 1  & 1
+ \end{pmatrix}
+ \]
+ 计算过程
+ \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 130454.jpg}
+ \end{figure}
+ 计算得：
+ \begin{equation}
+    \left[
+    \begin{array}{c}
+    W_{C_1B_1} \\
+    W_{C_2B_1} \\
+    W_{C_3B_1}
+    \end{array}
+    \right]
+    =
+    \left[
+    \begin{array}{c}
+    0.6666\\ 
+    0.1667 \\
+    0.1667
+    \end{array}
+    \right]
+    \end{equation}
+
+\item 求解$W_{CB_2}$
+    原矩阵
+ \[
+ W_{CB_2} = \begin{pmatrix}
+ 1 & 0.2 & 0.5 \\
+ 5& 1  & 2.5 \\
+ 2 & 0.4  & 1
+ \end{pmatrix}
+ \]
+ 计算过程
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 133359.jpg}
+    \end{figure}
+ 计算得：
+    \begin{equation}
+        \left[
+        \begin{array}{c}
+        W_{C_1B_2} \\
+        W_{C_2B_2} \\
+        W_{C_3B_2}
+        \end{array}
+        \right]
+        =
+        \left[
+        \begin{array}{c}
+        0.1250\\ 
+        0.6250 \\
+        0.2500
+        \end{array}
+        \right]
+        \end{equation}
+    \item 求解$W_{CB_3}$
+    原矩阵
+    \[
+    W_{CB_3} = \begin{pmatrix}
+        1 & 2 & 10 \\
+        0.5& 1  & 5 \\
+        0.1 & 0.2  & 1
+        \end{pmatrix}
+    \]
+    计算过程
+    见附录
+    \\计算得：
+        \begin{equation}
+            \left[
+            \begin{array}{c}
+            W_{C_1B_2} \\
+            W_{C_2B_2} \\
+            W_{C_3B_2}
+            \end{array}
+            \right]
+            =
+            \left[
+            \begin{array}{c}
+            0.6250\\ 
+            0.3125 \\
+            0.0625
+            \end{array}
+            \right]
+        \end{equation}
+   
+
+        
+\end{enumerate}
+
+\subsection{求解$W_{BA}$}
+原矩阵
+    \[
+     W_{BA} = \begin{pmatrix}
+     1 & 2 & 4 \\
+     0.5& 1  & 2 \\
+     0.25 & 0.5  & 1
+     \end{pmatrix}
+    \]
+    计算过程
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 134258.jpg}
+    \end{figure}
+        计算得：
+        \begin{equation}
+            \left[
+            \begin{array}{c}
+            W_{C_1B_2} \\
+            W_{C_2B_2} \\
+            W_{C_3B_2}
+            \end{array}
+            \right]
+            =
+            \left[
+            \begin{array}{c}
+            0.5715\\ 
+            0.2857 \\
+            0.1428
+            \end{array}
+            \right]
+            \end{equation}
+
+
+\subsection{矩阵相乘} 
+\begin{equation}
+    \left[
+    \begin{array}{c}
+    W_{C_1A} \\
+    W_{C_2A} \\
+    W_{C_3A}
+    \end{array}
+    \right]
+    =
+    \left[
+    \begin{array}{ccc}
+        0.6666 & 0.1250 & 0.6250\\ 
+        0.1667 & 0.6250 & 0.3125 \\
+        0.1667 & 0.2500 & 0.0625
+    \end{array}
+    \right]
+    \left[
+    \begin{array}{c}
+        0.5715\\ 
+        0.2857 \\
+        0.1428
+    \end{array}
+    \right]
+    \end{equation}
+得
+    \begin{equation}
+        \left[
+        \begin{array}{c}
+        W_{C_1A} \\
+        W_{C_2A} \\
+        W_{C_3A}
+        \end{array}
+        \right]
+        =
+        \left[
+        \begin{array}{c}
+            0.5059\\ 
+            0.3185 \\
+            0.1756
+        \end{array}
+        \right]
+        \end{equation}
+\section{选择结果}
+所以得到最终结果为写数学建模作业，因此，我们得出李华周末应该写数学建模作业
+\section{附录}
+$M_{CB_3}$计算过程
+     \begin{figure}[hb]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 133909.jpg}
+     \end{figure}
+\end{document}  
+

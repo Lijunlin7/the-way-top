@@ -1,0 +1,160 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ctex}
+\usepackage{booktabs} 
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\lstset{
+    language=Python, % 设置语言
+ basicstyle=\ttfamily, % 设置字体族
+ breaklines=true, % 自动换行
+ keywordstyle=\bfseries\color{NavyBlue}, % 设置关键字为粗体，颜色为 NavyBlue
+ morekeywords={}, % 设置更多的关键字，用逗号分隔
+ emph={self}, % 指定强调词，如果有多个，用逗号隔开
+    emphstyle=\bfseries\color{Rhodamine}, % 强调词样式设置
+    commentstyle=\itshape\color{black!50!white}, % 设置注释样式，斜体，浅灰色
+    stringstyle=\bfseries\color{PineGreen!90!black}, % 设置字符串样式
+    columns=flexible,
+    numbers=left, % 显示行号在左边
+    numbersep=2em, % 设置行号的具体位置
+    numberstyle=\footnotesize, % 缩小行号
+    frame=single, % 边框
+    framesep=1em % 设置代码与边框的距离
+}
+
+\title{抢渡长江的数学建模分析}
+\author{李俊霖}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{任务}
+我将用python构建一个基于llama 2的聊天机器人，然后用Api对于它进行调用
+\section{结构}
+用 Streamlit 作为前端，用 Python 构建一个 Llama 2 聊天机器人，而 LLM 后端则通过对 Replicate 上托管的 Llama 2 模型的 API 调用来处理
+\section{获取Replicate API 令牌}
+\begin{enumerate}[(1)]
+    \item 转到Replicate\href {https://llama2.streamlit.app}{ https://llama2.streamlit.app}
+    \item 使用您的 GitHub 帐户登录。
+    \item 转到 API 令牌页面并复制您的 API 令牌。
+\end{enumerate}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-14 231037.jpg}
+\end{figure}
+新建一个Api-Token，这个Api-Token就是之后你进行远程调用时所需要的 
+\section{设置编码环境}
+本地开发
+\\ \indent 要设置本地编码环境，请在命令行提示符中输入以下命令：
+
+\begin{lstlisting}
+    pip install streamlit replicate
+\end{lstlisting}
+
+\section{构建应用程序} 
+总代码
+\begin{lstlisting}
+import streamlit as st
+import replicate
+import os
+
+# App title
+st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
+
+# Replicate Credentials
+with st.sidebar:
+    st.title('🦙💬 Llama 2 Chatbot')
+    if 'REPLICATE_API_TOKEN' in st.secrets:
+        st.success('API key already provided!', icon='✅')
+        replicate_api = st.secrets['REPLICATE_API_TOKEN']
+    else:
+        replicate_api = st.text_input('Enter Replicate API token:', type='password')
+        if not (replicate_api.startswith('r8_') and len(replicate_api)==40):
+            st.warning('Please enter your credentials!', icon='⚠️')
+        else:
+            st.success('Proceed to entering your prompt message!', icon='👉')
+    os.environ['REPLICATE_API_TOKEN'] = replicate_api
+
+    st.subheader('Models and parameters')
+    selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
+    if selected_model == 'Llama2-7B':
+        llm = 'a16z-infra/llama7b-v2-chat:4f0a4744c7295c024a1de15e1a63c880d3da035fa1f49bfd344fe076074c8eea'
+    elif selected_model == 'Llama2-13B':
+        llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
+    temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
+    top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
+    max_length = st.sidebar.slider('max_length', min_value=32, max_value=128, value=120, step=8)
+    st.markdown('📖 Learn how to build this app in this [blog](https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/)!')
+
+# Store LLM generated responses
+if "messages" not in st.session_state.keys():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+
+# Display or clear chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+def clear_chat_history():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+
+# Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
+def generate_llama2_response(prompt_input):
+    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
+    for dict_message in st.session_state.messages:
+        if dict_message["role"] == "user":
+            string_dialogue += "User: " + dict_message["content"] + "\n\n"
+        else:
+            string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
+    output = replicate.run('a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5', 
+                           input={"prompt": f"{string_dialogue} {prompt_input} Assistant: ",
+                                  "temperature":temperature, "top_p":top_p, "max_length":max_length, "repetition_penalty":1})
+    return output
+
+# User-provided prompt
+if prompt := st.chat_input(disabled=not replicate_api):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.write(prompt)
+
+# Generate a new response if last message is not from assistant
+if st.session_state.messages[-1]["role"] != "assistant":
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = generate_llama2_response(prompt)
+            placeholder = st.empty()
+            full_response = ''
+            for item in response:
+                full_response += item
+                placeholder.markdown(full_response)
+            placeholder.markdown(full_response)
+    message = {"role": "assistant", "content": full_response}
+    st.session_state.messages.append(message)
+\end{lstlisting} 
+\section{我部署时解决的问题}
+\begin{enumerate}[(1)]% 次级序号
+    \item 首先，创建一个文件夹，用vscode打开文件
+    \item 设置.env虚拟环境
+    \item 然后按照部署相关环境，比如streamlit和republic
+    \item 之后在此文件夹中新建一个文件夹.streamlit
+    \item 在.streamlit文件夹中新建secrets.toml文件,然后如照片那样在其中输入之前的Api
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fi/微信图片_20250314233640.jpg}
+    \end{figure}
+    \item 最后进行调用，记住一定要用
+    \begin{lstlisting}
+    streamlit run main.py
+    \end{lstlisting} 
+    最后成功了
+    \end{enumerate}
+\section{声明}
+此篇文章深度借鉴了{https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/}{如何构建 Llama 2 聊天机器人}这篇文章，这篇文章只是记录一下自己的学习过程与学习心得，希望对于有所帮助
+\end{document}

@@ -1,0 +1,125 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ctex}
+\usepackage{booktabs} 
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\lstset{
+    language=Python, % 设置语言
+ basicstyle=\ttfamily, % 设置字体族
+ breaklines=true, % 自动换行
+ keywordstyle=\bfseries\color{NavyBlue}, % 设置关键字为粗体，颜色为 NavyBlue
+ morekeywords={}, % 设置更多的关键字，用逗号分隔
+ emph={self}, % 指定强调词，如果有多个，用逗号隔开
+    emphstyle=\bfseries\color{Rhodamine}, % 强调词样式设置
+    commentstyle=\itshape\color{black!50!white}, % 设置注释样式，斜体，浅灰色
+    stringstyle=\bfseries\color{PineGreen!90!black}, % 设置字符串样式
+    columns=flexible,
+    numbers=left, % 显示行号在左边
+    numbersep=2em, % 设置行号的具体位置
+    numberstyle=\footnotesize, % 缩小行号
+    frame=single, % 边框
+    framesep=1em % 设置代码与边框的距离
+}
+
+\title{wsl虚拟机部署流程}
+\author{李俊霖}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{任务}
+我将基于Windows系统部署wsl并下载虚拟机ubuntu,搭建linux虚拟环境
+\section{wsl优势}
+通过询问deepseek,我们能更加全面的获知wsl相比于虚拟机的优势
+\\1. 性能更高
+\\ \indent  WSL：直接与 Windows 内核集成，无需虚拟化硬件，因此性能接近原生 Linux。
+\\ \indent 虚拟机：需要虚拟化整个操作系统和硬件，性能开销较大，尤其是在 CPU 和 I/O 密集型任务中。
+\\2. 资源占用更少
+\\ \indent WSL：轻量级，仅运行 Linux 用户空间，内存和 CPU 占用较低。
+\\ \indent 虚拟机：需要为虚拟化环境分配独立的资源（如内存、CPU 和存储），资源占用较高。
+\\3. 启动速度更快
+\\ \indent WSL：启动几乎是瞬时的，因为不需要启动完整的操作系统。
+\\ \indent 虚拟机：需要启动完整的 Linux 内核和操作系统，启动时间较长。
+\\4. 与 Windows 系统无缝集成
+\\ \indent WSL：
+\\ \indent 可以直接访问 Windows 文件系统（如 /mnt/c 对应 Windows 的 C 盘）。
+\\ \indent 支持在 Windows 和 Linux 之间无缝调用命令行工具。
+\\ \indent 支持在 Windows 终端中运行 Linux 命令。
+\\ \indent 虚拟机：文件系统和网络通常是隔离的，需要通过共享文件夹或网络配置来实现交互。
+\\5. 开发体验更佳
+\\ \indent WSL：
+\\ \indent 支持直接运行 Linux 开发工具（如 GCC、Python、Node.js 等）。
+\\ \indent 支持与 Visual Studio Code 等开发工具深度集成。
+\\ \indent 可以在 Windows 上直接运行 Linux GUI 应用（WSLg）。
+\\ \indent 虚拟机：需要额外的配置才能实现类似的功能，且体验不如 WSL 流畅。
+\\6. 无需管理虚拟化软件
+\\ \indent WSL：直接集成在 Windows 中，无需安装和管理额外的虚拟化软件（如 VMware、VirtualBox）。
+\\ \indent 虚拟机：需要安装和配置虚拟化软件，增加了复杂性。
+\\7. 更适合轻量级 Linux 任务
+\\ \indent WSL：适合运行命令行工具、脚本、开发环境等轻量级任务。
+\\ \indent 虚拟机：更适合需要完整 Linux 桌面环境或复杂系统配置的场景。
+\\8. 支持 GPU 加速（WSL 2）
+\\ \indent WSL 2：支持 GPU 加速，适合机器学习、数据科学等需要 GPU 计算的任务。
+\\ \indent 虚拟机：GPU 虚拟化支持有限，配置复杂且性能较差。
+\\9. 更低的系统开销
+\\ \indent WSL：由于不需要虚拟化硬件，系统开销更低，适合低配置设备。
+\\ \indent 虚拟机：需要为虚拟化环境分配独立的资源，对系统配置要求较高。
+\\10. 易于安装和配置
+\\ \indent WSL：通过 Microsoft Store 或命令行即可快速安装，配置简单。
+\\ \indent 虚拟机：需要下载 ISO 镜像、安装操作系统、配置虚拟硬件等，步骤繁琐。
+
+\section{部署步骤}
+\subsection{安装WSL}
+确认虚拟化已启用
+\\ \indent 检查任务管理器
+\begin{enumerate}[(1)]% 次级序号
+    \item 打开任务管理器（Ctrl + Shift + Esc 或右键点击任务栏选择“任务管理器”）。
+    \item 转到 性能（Performance）选项卡。
+    \item 在 CPU 栏目下方，应看到 虚拟化（Virtualization）显示为 启用（Enabled）。
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 191706.jpg}
+    \end{figure}
+\end{enumerate}
+如果没有启用，进行以下步骤
+\begin{enumerate}[(1)]% 次级序号
+    \item 打开 PowerShell 以管理员身份运行。
+    
+    \item 启用 WSL 功能：
+    \begin{lstlisting}
+        dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+    \end{lstlisting}
+
+    \item  3. 启用虚拟机平台（WSL 2 所必需）：
+    \begin{lstlisting}
+        dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+    \end{lstlisting}
+\end{enumerate}
+ \indent 下载WSL2
+\begin{lstlisting}
+    wsl --set-default-version 2
+\end{lstlisting}
+
+\section{安装Ubuntu}
+在微软软件商店进行下载下载如图的版本（命令行界面）
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 192615.jpg}
+\end{figure}
+\\ \indent 下载后打开,会进行用户名的设置和密码的设置，注意：用户名不能大写，密码会被隐藏，但会进行二次确认
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fi/屏幕截图 2025-03-16 192632.jpg}
+\end{figure}
+\\ \indent 点击如图的倒三角形状，然后点击Ubuntu，就会打开linux环境。
+然后就一切好了
+\section{声明}
+此篇文章深度借鉴了{https://blog.csdn.net/yueyuanhuaqing/article/details/140377645}{WSL 安装}这篇文章，这篇文章只是记录一下自己的学习过程与学习心得，希望对于有所帮助
+\end{document}
