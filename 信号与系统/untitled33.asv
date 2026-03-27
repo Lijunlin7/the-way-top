@@ -1,0 +1,46 @@
+height = [0, 300, 600, 1000, 1500, 2000];
+pressure = [0.9689, 0.9322, 0.8969, 0.8519, 0.7989, 0.7491];
+
+% 每隔100米的高度点
+h_interp = 0:100:2000;
+
+% 初始化插值结果
+p_interp = zeros(size(h_interp));
+
+% 手动线性插值
+for i = 1:length(h_interp)
+    h = h_interp(i);
+    
+    % 找到h所在的区间
+    for j = 1:length(height)-1
+        if h >= height(j) && h <= height(j+1)
+            % 线性插值公式: P = P1 + (P2-P1)/(h2-h1) * (h-h1)
+            p_interp(i) = pressure(j) + (pressure(j+1) - pressure(j)) / (height(j+1) - height(j)) * (h - height(j));
+            break;
+        elseif h == height(end)
+            p_interp(i) = pressure(end);
+            break;
+        end
+    end
+end
+
+% 理论压强计算
+p_theory = zeros(size(h_interp));
+for i = 1:length(h_interp)
+    h = h_interp(i);
+    p_theory(i) = 1.0332 * exp(-(h + 500) / 7756);
+end
+
+% 显示结果
+fprintf('高度(米)\t插值压强\t理论压强\n');
+for i = 1:length(h_interp)
+    fprintf('%d\t\t%.4f\t\t%.4f\n', h_interp(i), p_interp(i), p_theory(i));
+end
+
+% 绘制对比图
+plot(h_interp, p_interp, 'b-o', h_interp, p_theory, 'r--x');
+xlabel('高度(米)');
+ylabel('压强(千牛/米^2)');
+legend('插值压强', '理论压强');
+title('大气压强随高度变化对比');
+grid on;
